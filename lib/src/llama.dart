@@ -33,7 +33,7 @@ class Llama {
   late Pointer<llama_model> model = nullptr;
   late Pointer<llama_context> ctx = nullptr;
   late Pointer<llama_sampler> sampler = nullptr;
-  List<String> responce = [];
+  List<String> response = []; // For future use
   bool stopProcess = false;
 
   factory Llama({
@@ -64,6 +64,7 @@ class Llama {
     _lib.llama_backend_free();
   }
 
+  /// Function to load model and init model vocab and context
   Future<(bool, String)> loadModel(String path) async{
     final pathPtr = path.toNativeUtf8().cast<Char>();
     model = _lib.llama_model_load_from_file(pathPtr, mParams.getParams());
@@ -87,10 +88,12 @@ class Llama {
     return (true, "Model initialized successfuly");
   }
 
+  /// To stop inference
   void sendStop(){
     stopProcess = true;
   }
 
+  /// Not suported yet
   Stream<String> generateStreamed(String prompt, {
     int nPredict=256,
     double temp=0.8,
@@ -106,7 +109,15 @@ class Llama {
     _lib.llama_sampler_chain_add(sampler, _lib.llama_sampler_init_top_k(topK));
     _lib.llama_sampler_chain_add(sampler, _lib.llama_sampler_init_top_p(topP, 1));
     _lib.llama_sampler_chain_add(sampler, _lib.llama_sampler_init_min_p(minP, 1));
-    _lib.llama_sampler_chain_add(sampler, _lib.llama_sampler_init_penalties(64, penaltyRepeat, penaltyFreq, penaltyPresent));
+    _lib.llama_sampler_chain_add(
+      sampler,
+      _lib.llama_sampler_init_penalties(
+        64,
+        penaltyRepeat,
+        penaltyFreq,
+        penaltyPresent
+      )
+    );
     _lib.llama_sampler_chain_add(sampler, _lib.llama_sampler_init_dist(LLAMA_DEFAULT_SEED));
     if(sampler == nullptr){
       throw Exception('Sampler initialization error');
@@ -161,6 +172,7 @@ class Llama {
     }
   }
 
+  /// Process and generate a responce
   Future<String> generate(
     String prompt, {
     bool isIsolated=false,
@@ -178,7 +190,15 @@ class Llama {
     _lib.llama_sampler_chain_add(sampler, _lib.llama_sampler_init_top_k(topK));
     _lib.llama_sampler_chain_add(sampler, _lib.llama_sampler_init_top_p(topP, 1));
     _lib.llama_sampler_chain_add(sampler, _lib.llama_sampler_init_min_p(minP, 1));
-    _lib.llama_sampler_chain_add(sampler, _lib.llama_sampler_init_penalties(64, penaltyRepeat, penaltyFreq, penaltyPresent));
+    _lib.llama_sampler_chain_add(
+      sampler,
+      _lib.llama_sampler_init_penalties(
+        64,
+        penaltyRepeat,
+        penaltyFreq,
+        penaltyPresent
+      )
+    );
     _lib.llama_sampler_chain_add(sampler, _lib.llama_sampler_init_dist(LLAMA_DEFAULT_SEED));
     if(sampler == nullptr){
       throw Exception('Sampler initialization error');
@@ -242,6 +262,7 @@ class Llama {
     }
   }
 
+  /// Format a text for model use
   String formatWithTemplate(dynamic prompt) {
     if(prompt is List<Map<String, String>> && prompt.isNotEmpty){
       final messages = ffi.malloc<llama_chat_message>(prompt.length);
@@ -345,6 +366,7 @@ class Llama {
     }
   }
 
+  /// Tokenize text to be used in model's inference
   (List<int>, String) tokenize(String text){
     final textPtr = text.toNativeUtf8();
     final textLen = textPtr.length;
@@ -382,13 +404,14 @@ class Llama {
     }
   }
 
+  /// Tranform tokens into text
   (int, String) _detokenize(List<int> tokens){
     int pieceSize = 0;
     final List<int> n = [];
     for(int pos=0; pos<tokens.length; pos++){
       n.add(-_lib.llama_token_to_piece(vocab, tokens[pos], nullptr, 0, 0, true));
       if(n[pos] <= 0){
-        return (1, 'Piece size got an error while computation');
+        return (1, 'Piece size got an error while in computation');
       }
       pieceSize += n[pos];
     }
@@ -426,6 +449,7 @@ class Llama {
   }
 }
 
+/// Model Params handler
 class LlamaModelParams{
   late llama_model_params _params;
 
@@ -457,6 +481,7 @@ class LlamaModelParams{
     return _params;
   }
 
+  /// Get a specific parameter from key name
   dynamic getParamByKey(String key){
     switch(key){
       case 'devices':
@@ -492,6 +517,7 @@ class LlamaModelParams{
     }
   }
 
+  /// Modfy a specific parameter 
   void setParam(String key, dynamic value){
     switch(key){
       case 'devices':
@@ -541,6 +567,7 @@ class LlamaModelParams{
   }
 }
 
+/// Context Handler
 class LlamaCtxParams{
   late llama_context_params _params;
 
@@ -617,10 +644,12 @@ class LlamaCtxParams{
     if(kvUnified != null) _params.kv_unified = kvUnified;
   }
 
+  /// Get all parameters
   llama_context_params getParams(){
     return _params;
   }
 
+  /// Get a specific parameter by key
   dynamic getParamByKey(String key){
     switch(key){
       case 'n_ctx':
@@ -688,6 +717,7 @@ class LlamaCtxParams{
     }
   }
 
+  /// Modfy a specific parameter
   void setParam(String key, dynamic value){
     switch(key){
       case 'n_ctx':

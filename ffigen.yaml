@@ -1,8 +1,9 @@
-# Para executar o ffigen é necessário fazer o build do cmake excutando:
+# To execute ffigen you must download llama.cpp:
 # 1. cd src
 # 2. mkdir build
 # 3. cd build
 # 4. cmake ..
+# 5. cd ../../
 # Run with `dart run ffigen --config ffigen.yaml`.
 name: llamacpp
 description: |
@@ -15,7 +16,13 @@ headers:
     - 'src/llama.cpp/include/llama.h'
 compiler-opts:
   - "-Isrc/llama.cpp/ggml/include"
-  - "-Isrc/llama.cpp/include" 
+  - "-Isrc/llama.cpp/include"
+  
+  # Use this if ffigen can not find clang include files by itself
+  # Uncoment it and change the clang version
+  # Or run 'clang -print-resource-dir' and copy the result to this line
+  # - '-I/usr/lib/clang/22/include'
+
 preamble: |
   // ignore_for_file: always_specify_types
   // ignore_for_file: camel_case_types

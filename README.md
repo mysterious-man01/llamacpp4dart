@@ -1,23 +1,24 @@
-## Llama.cpp bind for Dart/Flutter.
+# 🦙 llamacpp4dart
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-### A Dart bind for C/C++ [Llama.cpp](https://github.com/ggml-org/llama.cpp)'s code for use mainly on Android.
+### A Dart bind for C/C++ [Llama.cpp](https://github.com/ggml-org/llama.cpp)'s code designed for Android.
 
-> **[IMPORTANT]**
+> **⚠️ [IMPORTANT]**
 
-- This project is on alfa preview and can have unespected bugs!
+- This project is on alpha preview and can have unexpected bugs!
 
 - It is not fully implemented!
 
 ## Features
 
 - Inference with llama.cpp using the `.gguf` extension 
-- GPU suport with Vulkan
+- GPU support with Vulkan
 
-## TODO
+## Compatbility
 
-- Add suport for other platforms
+- Only Android ecosystem (aarch64 and x86_64)
+    - Not tested on x86_64
 
 ## Installation 
 
@@ -32,19 +33,30 @@ dependencies:
         ref: main
 ```
 
-- To compile an app, use `flutter build apk` or command on next topic
+- To compile an app, use **`flutter build apk`** or command on next topic
 
 ## Compiling Example App
 
 - Run the following command on terminal inside `llamacpp4dart/example`
 
-> CMAKE_BUILD_PARALLEL_LEVEL=[n_core] flutter build apk -v
+```bash
+    # Replace [n_core] with the number of CPU cores to speed up compilation
+    CMAKE_BUILD_PARALLEL_LEVEL=[n_core] flutter build apk -v
+```
 
 ## Limitations
 
-- Using Flutter's debuging tool may cause crash when Infering an answer
+- **Using Flutter's debuging tool may cause crash when Infering an answer**
+- Streamed response not supported
 
-## Source Projects and References
+## TODO
+
+- Add suport for other platforms
+- Add suport for multimodal models
+- Improve response precision
+- Add streamed response
+
+## Source Project and References
 
 - Ggerganov's [Llama.cpp](https://github.com/ggml-org/llama.cpp) project.
 
@@ -52,6 +64,6 @@ dependencies:
 
 - Dane Madsen's [maid_llm](https://github.com/Mobile-Artificial-Intelligence/llama_sdk.git) project.
 
-## Licence
+## License
 
 This project is licensed under the MIT License - see the `LICENSE.md` file for details.
